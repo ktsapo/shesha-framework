@@ -24,6 +24,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace Shesha.Authorization
 {
@@ -39,13 +40,14 @@ namespace Shesha.Authorization
         private readonly IRepository<ShaUserRegistration, Guid> _userRegistration;
         private readonly IExternalAuthConfiguration _externalAuthConfiguration;
         private readonly IExternalAuthManager _externalAuthManager;
-        private readonly UserRegistrationManager _userRegistrationManager;
+        private readonly IUserRegistrationManager _userRegistrationManager;
         private readonly IRepository<Person, Guid> _personRepository;
         private readonly IRepository<MobileDevice, Guid> _mobileDeviceRepository;
         private readonly ITokenBlacklistService _tokenBlacklistService;
         private readonly UserManager<User> _userManager;
         private readonly AbpUserClaimsPrincipalFactory<User, Role> _claimsPrincipalFactory;
         private readonly IConfiguration _appConfiguration;
+        private readonly IRepository<User, long> _userRepository;
 
         public TokenAuthController(
             LogInManager logInManager,
@@ -54,14 +56,15 @@ namespace Shesha.Authorization
             TokenAuthConfiguration configuration,
             IExternalAuthConfiguration externalAuthConfiguration,
             IExternalAuthManager externalAuthManager,
-            UserRegistrationManager userRegistrationManager,
+            IUserRegistrationManager userRegistrationManager,
             IRepository<Person, Guid> personRepository,
             IRepository<ShaUserRegistration, Guid> userRegistration,
             IRepository<MobileDevice, Guid> mobileDeviceRepository,
             ITokenBlacklistService tokenBlacklistService,
             UserManager<User> userManager,
             AbpUserClaimsPrincipalFactory<User, Role> claimsPrincipalFactory,
-            IConfiguration appConfiguration)
+            IConfiguration appConfiguration,
+            IRepository<User, long> userRepository)
         {
             _logInManager = logInManager;
             _tenantCache = tenantCache;
@@ -77,6 +80,7 @@ namespace Shesha.Authorization
             _userManager = userManager;
             _claimsPrincipalFactory = claimsPrincipalFactory;
             _appConfiguration = appConfiguration;
+            _userRepository = userRepository;
         }
 
         [HttpPost]
@@ -331,19 +335,22 @@ namespace Shesha.Authorization
                 true
             );
 
-            user.Logins = new List<UserLogin>
+            using (var uow = UnitOfWorkManager.Begin(TransactionScopeOption.RequiresNew))
             {
-                new UserLogin
+                var persistedUser = await _userRepository.GetAsync(user.Id);
+
+                persistedUser.Logins.Add(new UserLogin
                 {
                     LoginProvider = externalUser.Provider,
                     ProviderKey = externalUser.ProviderKey,
-                    TenantId = user.TenantId
-                }
-            };
+                    TenantId = persistedUser.TenantId,
+                    UserId = persistedUser.Id
+                });
 
-            await CurrentUnitOfWork.SaveChangesAsync();
+                await uow.CompleteAsync();
 
-            return user;
+                return persistedUser;
+            }
         }
 
         private async Task<ExternalAuthUserInfo> GetExternalUserInfoAsync(ExternalAuthenticateModel model)

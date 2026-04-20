@@ -114,7 +114,7 @@ namespace Shesha.Authorization
             return authenticateResult;
         }
 
-        private async Task<AuthenticateResultModel> GetAuthenticateResultAsync(ShaLoginResult<User> loginResult, string imei) 
+        private async Task<AuthenticateResultModel> GetAuthenticateResultAsync(ShaLoginResult<User> loginResult, string imei)
         {
             var validFrom = DateTime.UtcNow;
             var expiresOn = validFrom.Add(_configuration.Expiration);
@@ -326,17 +326,17 @@ namespace Shesha.Authorization
 
         private async Task<User> RegisterExternalUserAsync(ExternalAuthUserInfo externalUser)
         {
-            var user = await _userRegistrationManager.RegisterAsync(
-                externalUser.Name,
-                externalUser.Surname,
-                externalUser.EmailAddress,
-                externalUser.EmailAddress,
-                Authorization.Users.User.CreateRandomPassword(),
-                true
-            );
-
             using (var uow = UnitOfWorkManager.Begin(TransactionScopeOption.RequiresNew))
             {
+                var user = await _userRegistrationManager.RegisterAsync(
+                    externalUser.Name,
+                    externalUser.Surname,
+                    externalUser.EmailAddress,
+                    externalUser.EmailAddress,
+                    Authorization.Users.User.CreateRandomPassword(),
+                    true
+                );
+
                 var persistedUser = await _userRepository.GetAsync(user.Id);
 
                 persistedUser.Logins.Add(new UserLogin
@@ -388,7 +388,7 @@ namespace Shesha.Authorization
             }
         }
 
-        private string CreateAccessToken(IEnumerable<Claim> claims) 
+        private string CreateAccessToken(IEnumerable<Claim> claims)
         {
             var validFrom = DateTime.UtcNow;
             var expiresOn = validFrom.Add(_configuration.Expiration);

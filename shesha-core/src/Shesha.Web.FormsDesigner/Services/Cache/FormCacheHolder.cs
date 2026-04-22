@@ -7,6 +7,7 @@ using Shesha.Cache;
 using Shesha.ConfigurationItems.Models;
 using Shesha.Domain;
 using Shesha.Web.FormsDesigner.Dtos;
+using System;
 using System.Threading.Tasks;
 
 namespace Shesha.Web.FormsDesigner.Services.Cache
@@ -18,6 +19,13 @@ namespace Shesha.Web.FormsDesigner.Services.Cache
         public FormCacheHolder(ICacheManager cacheManager, IConfiguration configuration) : base("FormsCache", cacheManager)
         {
             IsEnabled = !configuration.GetValue<bool>("disableFormsCache");
+
+            var expiration = configuration.GetValue<int?>("FormsCacheExpiration");
+            var expirationMins = expiration.HasValue && expiration.Value > 0
+                ? expiration.Value
+                : 24 * 60;
+
+            Cache.DefaultSlidingExpireTime = TimeSpan.FromMinutes(expirationMins);
         }
 
         public string GetCacheKey(string module, string name, ConfigurationItemViewMode mode)

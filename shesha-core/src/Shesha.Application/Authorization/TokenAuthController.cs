@@ -337,19 +337,18 @@ namespace Shesha.Authorization
                     true
                 );
 
-                var persistedUser = await _userRepository.GetAsync(user.Id);
-
-                persistedUser.Logins.Add(new UserLogin
+                user.Logins.Add(new UserLogin
                 {
                     LoginProvider = externalUser.Provider,
                     ProviderKey = externalUser.ProviderKey,
-                    TenantId = persistedUser.TenantId,
-                    UserId = persistedUser.Id
+                    TenantId = user.TenantId,
+                    UserId = user.Id
                 });
 
+                await _userRepository.UpdateAsync(user);
                 await uow.CompleteAsync();
 
-                return persistedUser;
+                return user;
             }
         }
 

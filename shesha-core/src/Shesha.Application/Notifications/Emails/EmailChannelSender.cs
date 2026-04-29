@@ -140,9 +140,9 @@ namespace Shesha.Notifications
                 IsBodyHtml = true,
             };
 
-            if (string.IsNullOrWhiteSpace(fromAddress) || smtpSettings.ForceFromAddressFromSettings)
+            if (string.IsNullOrWhiteSpace(fromAddress) || !smtpSettings.UseSmtpRelay)
             {
-                if (smtpSettings.UseSmtpRelay && !string.IsNullOrWhiteSpace(smtpSettings.DefaultFromAddress))
+                if (!string.IsNullOrWhiteSpace(smtpSettings.DefaultFromAddress))
                 {
                     message.From = new MailAddress(
                         smtpSettings.DefaultFromAddress,

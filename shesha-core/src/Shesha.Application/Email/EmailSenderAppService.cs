@@ -49,7 +49,6 @@ namespace Shesha.Email
                 EnableSsl = input.EnableSsl,
                 DefaultFromAddress = input.DefaultFromAddress,
                 DefaultFromDisplayName = input.DefaultFromDisplayName,
-                ForceFromAddressFromSettings = input.ForceFromAddressFromSettings,
             });
 
             return true;
@@ -74,7 +73,6 @@ namespace Shesha.Email
                 DefaultFromAddress = smtpSettings.DefaultFromAddress,
                 DefaultFromDisplayName = smtpSettings.DefaultFromDisplayName,
                 SupportSmtpRelay = smtpSettings.UseSmtpRelay,
-                ForceFromAddressFromSettings = smtpSettings.ForceFromAddressFromSettings,
 
                 RedirectAllMessagesTo = emailSettings.RedirectAllMessagesTo,
                 EmailsEnabled = emailSettings.EmailsEnabled,

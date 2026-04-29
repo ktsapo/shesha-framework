@@ -56,9 +56,5 @@
         /// </summary>
         public bool UseSmtpRelay { get; set; }
 
-        /// <summary>
-        /// If true, the from address on all outgoing emails will always be overridden with the address configured in settings, ignoring any caller-supplied from address.
-        /// </summary>
-        public bool ForceFromAddressFromSettings { get; set; }
     }
 }

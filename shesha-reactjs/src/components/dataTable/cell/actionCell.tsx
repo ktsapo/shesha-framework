@@ -1,6 +1,6 @@
 import { Tooltip } from 'antd';
 import React from 'react';
-import { IconType, ShaIcon } from '@/components';
+import { ShaIcon } from '@/components';
 import {
   isNavigationActionConfiguration,
   useConfigurableActionDispatcher,
@@ -14,9 +14,9 @@ import { useAsyncMemo } from '@/hooks/useAsyncMemo';
 import { useAvailableConstantsData } from '@/providers/form/utils';
 
 
-export interface IActionCellProps<D extends object = {}, V = any> extends ICommonCellProps<ITableActionColumn, D, V> { }
+export interface IActionCellProps<D extends object = {}, V = unknown> extends ICommonCellProps<ITableActionColumn, D, V> { }
 
-export const ActionCell = <D extends object = {}, V = any>(props: IActionCellProps<D, V>) => {
+export const ActionCell = <D extends object = {}, V = unknown>(props: IActionCellProps<D, V>) => {
   const { columnConfig } = props;
   const { changeActionedRow } = useDataTable();
   const { executeAction, prepareArguments, useActionDynamicContext } = useConfigurableActionDispatcher();
@@ -27,7 +27,7 @@ export const ActionCell = <D extends object = {}, V = any>(props: IActionCellPro
 
   const allData = useAvailableConstantsData();
 
-  const getRowData = (data) => {
+  const getRowData = (data: IActionCellProps<D, V>): D | undefined => {
     return data?.cell?.row?.original;
   };
 
@@ -38,8 +38,7 @@ export const ActionCell = <D extends object = {}, V = any>(props: IActionCellPro
   };
 
 
-  const clickHandler = (event, data) => {
-
+  const clickHandler = (event: React.MouseEvent<HTMLAnchorElement>, data: IActionCellProps<D, V>) => {
     event.preventDefault();
 
     if (actionConfiguration) {
@@ -66,7 +65,7 @@ export const ActionCell = <D extends object = {}, V = any>(props: IActionCellPro
         <a className="sha-link" onClick={(e) => clickHandler(e, props)}>
           {icon && (
             <Tooltip title={description}>
-              <ShaIcon iconName={icon as IconType} />
+              <ShaIcon iconName={icon} />
             </Tooltip>
           )}
         </a>
@@ -74,7 +73,7 @@ export const ActionCell = <D extends object = {}, V = any>(props: IActionCellPro
         <Link className="sha-link" href={navigationUrl} onClick={(e) => clickHandler(e, props)}>
           {icon && (
             <Tooltip title={description}>
-              <ShaIcon iconName={icon as IconType} />
+              <ShaIcon iconName={icon} />
             </Tooltip>
           )}
         </Link>}

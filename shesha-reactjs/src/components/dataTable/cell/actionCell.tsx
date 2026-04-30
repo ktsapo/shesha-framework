@@ -1,5 +1,5 @@
 import { Tooltip } from 'antd';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ShaIcon } from '@/components';
 import {
   isNavigationActionConfiguration,
@@ -30,11 +30,13 @@ export const ActionCell = <D extends object = {}, V = unknown>(props: IActionCel
     return data?.cell?.row?.original;
   };
 
-  const evaluationContext = {
+  const selectedRow = getRowData(props);
+  const evaluationContext = useMemo(() => ({
     ...allData,
-    selectedRow: getRowData(props),
-    ...dynamicContext
-  };
+    selectedRow,
+    ...dynamicContext,
+  }), [allData, selectedRow, dynamicContext]);
+  
 
 
   const clickHandler = (event: React.MouseEvent<HTMLAnchorElement>, data: IActionCellProps<D, V>) => {

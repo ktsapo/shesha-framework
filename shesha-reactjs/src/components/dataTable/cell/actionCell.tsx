@@ -13,7 +13,6 @@ import Link from 'next/link';
 import { useAsyncMemo } from '@/hooks/useAsyncMemo';
 import { useAvailableConstantsData } from '@/providers/form/utils';
 
-
 export interface IActionCellProps<D extends object = {}, V = unknown> extends ICommonCellProps<ITableActionColumn, D, V> { }
 
 export const ActionCell = <D extends object = {}, V = unknown>(props: IActionCellProps<D, V>) => {
@@ -42,7 +41,8 @@ export const ActionCell = <D extends object = {}, V = unknown>(props: IActionCel
     event.preventDefault();
 
     if (actionConfiguration) {
-      changeActionedRow(data.row.original);
+      const rowData = getRowData(data);
+      changeActionedRow(rowData);
       executeAction({
         actionConfiguration: actionConfiguration,
         argumentsEvaluationContext: evaluationContext,
@@ -57,7 +57,7 @@ export const ActionCell = <D extends object = {}, V = unknown>(props: IActionCel
 
     const preparedArguments = await prepareArguments({ actionConfiguration, argumentsEvaluationContext: evaluationContext });
     return getUrlFromNavigationRequest(preparedArguments);
-  }, [actionConfiguration], "");
+  }, [actionConfiguration, evaluationContext], "");
 
   return (
     <>

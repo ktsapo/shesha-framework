@@ -1,6 +1,7 @@
 ﻿using GraphQL;
 using GraphQL.Types;
 using Shesha.GraphQL.Provider.AstValueNodes;
+using Shesha.Reflection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,6 +39,8 @@ namespace Shesha.GraphQL.Provider.GraphTypes
             }
 
             targetType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Where(p => !p.HasAttribute<Newtonsoft.Json.JsonIgnoreAttribute>()
+                        && !p.HasAttribute<System.Text.Json.Serialization.JsonIgnoreAttribute>())
                 .ToList()
                 .ForEach(pi =>
                 {

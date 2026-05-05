@@ -5,8 +5,8 @@ using Abp.Domain.Repositories;
 using Abp.Extensions;
 using Abp.Linq.Extensions;
 using Abp.ObjectMapping;
+using Shesha.Extensions;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 
 namespace Shesha
 {
@@ -50,6 +50,7 @@ namespace Shesha
             {
                 if (!sortInput.Sorting.IsNullOrWhiteSpace())
                 {
+                    SortingValidator.EnsureSortingAllowed(typeof(TEntity), sortInput.Sorting);
                     return query.OrderBy(sortInput.Sorting);
                 }
             }

@@ -6,12 +6,12 @@ using Abp.Auditing;
 using Abp.Localization;
 using Abp.Timing;
 using JetBrains.Annotations;
+using Newtonsoft.Json;
 using Shesha.Authorization.Users;
 using Shesha.Domain.Attributes;
 using Shesha.Domain.Enums;
 using Shesha.DynamicEntities;
 using Shesha.EntityHistory;
-using Shesha.Extensions;
 
 namespace Shesha.Domain
 {
@@ -114,6 +114,7 @@ namespace Shesha.Domain
         /// User record, may be null for non registered users
         /// </summary>
         [CanBeNull]
+        [JsonIgnore]
         [CascadeUpdateRules(false, true)]
         public virtual User User { get; set; }
 

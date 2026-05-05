@@ -340,6 +340,8 @@ where
             if (string.IsNullOrWhiteSpace(sorting))
                 return query;
 
+            SortingValidator.EnsureSortingAllowed(typeof(TEntity), sorting);
+
             var sortColumns = sorting.Split(',').Select(c => c.Trim()).Where(c => !string.IsNullOrWhiteSpace(c)).ToList();
             var sorted = false;
             foreach (var sortColumn in sortColumns)

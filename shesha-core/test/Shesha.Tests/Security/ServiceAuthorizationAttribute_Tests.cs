@@ -1,3 +1,4 @@
+using Abp.Application.Services;
 using FluentAssertions;
 using Microsoft.AspNetCore.Authorization;
 using Shesha.Api;
@@ -109,6 +110,22 @@ namespace Shesha.Tests.Security
                 methodAuthAttr.Access.Should().Be(RefListPermissionedAccess.RequiresPermissions,
                     "If ExecuteHql has method-level auth, it should not weaken the class-level guard");
             }
+        }
+
+        /// <summary>
+        /// Regression test for issue #4652: NHibernateAppService must derive from
+        /// <see cref="ApplicationService"/>. The [SheshaAuthorize] guard is only enforced by
+        /// ApiAuthorizationHelper for types assignable to ApplicationService (or ControllerBase);
+        /// a service implementing IApplicationService directly is silently skipped and remains
+        /// publicly accessible despite the attribute.
+        /// </summary>
+        [Fact]
+        public void NHibernateAppService_should_derive_from_ApplicationService_so_guard_is_enforced()
+        {
+            typeof(ApplicationService).IsAssignableFrom(typeof(NHibernateAppService))
+                .Should().BeTrue(
+                    "NHibernateAppService must inherit ApplicationService, otherwise ApiAuthorizationHelper " +
+                    "skips authorization and the class-level [SheshaAuthorize] guard is never enforced");
         }
 
         /// <summary>
